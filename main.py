@@ -357,6 +357,52 @@ def ContourApproximation2(output_folder):
     cv2.destroyAllWindows()
 
 
+def largest_Area2(output_folder):
+    # Load the first .tif image in the folder
+    image_paths = glob.glob(os.path.join(output_folder, "*.tif"))
+    if not image_paths:
+        print("No .tif images found in the specified folder.")
+        return
+
+    img_path = image_paths[0]
+    img = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
+
+    if img is None:
+        print("Image could not be loaded. Please check the file path and format.")
+        return
+
+    # Apply binary thresholding to the image
+    _, threshold = cv2.threshold(img, 60, 255, cv2.THRESH_BINARY)
+
+    # Find all contours in the binary image
+    contours, _ = cv2.findContours(threshold, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Sort contours by area in descending order
+    Largest_areas = sorted(contours, key=cv2.contourArea, reverse=True)
+    print(len(Largest_areas))
+
+    # create a mask
+    mask = np.zeros_like(img, dtype=np.uint8)  # Black mask
+
+    contour_on_Mask = cv2.drawContours(
+        mask, Largest_areas[:], 0, (255, 255, 255), thickness=cv2.FILLED
+    )
+
+    # img_bitContour = cv2.bitwise_or(img, img, mask)
+    mask_not_img = cv2.bitwise_not(mask)
+    mask_merge_ = cv2.bitwise_and(img, img, mask=mask_not_img)
+
+    _, threshold2 = cv2.threshold(mask_merge_, 60, 250, cv2.THRESH_BINARY)
+
+    cv2.imshow("contour_on_Mask", contour_on_Mask)
+    cv2.imshow("mask_not_img", mask_not_img)
+    cv2.imshow("mask merge", mask_merge_)
+    cv2.imshow("enhancement", threshold2)
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
 if __name__ == "__main__":
     images_folder = r"/Users/bullet/Desktop/Machine_Learning projects_2024/Image_Processing/contourAnalysis/1p95Kell1_00_22-11-23_12-52-34p714"
     output_folder = r"/Users/bullet/Desktop/Machine_Learning projects_2024/Image_Processing/contourAnalysis/Loaded_Images1"
@@ -365,7 +411,8 @@ if __name__ == "__main__":
     # contour_technique1(output_folder)
 
     # Moment_Calculation(output_folder)
-    MaxContour_Area(output_folder)
+    # MaxContour_Area(output_folder)
     # ArcLength(output_folder)
     # ContourApproximation(output_folder)
     # ContourApproximation2(output_folder)
+    largest_Area2(output_folder)
