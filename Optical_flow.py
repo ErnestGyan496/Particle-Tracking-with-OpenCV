@@ -20,6 +20,7 @@ if first_frame is None:
 
 # Parameters for Shi-Tomasi corner detection
 feature_params = dict(maxCorners=300, qualityLevel=0.3, minDistance=5, blockSize=7)
+
 # Parameters for Lucas-Kanade optical flow
 lk_params = dict(
     winSize=(15, 15),
@@ -29,17 +30,39 @@ lk_params = dict(
 
 # Create some random colors
 color = np.random.randint(0, 255, (100, 3))
+
 # Find corners in the first frame
+# p0 = cv2.goodFeaturesToTrack(first_frame, mask=None, **feature_params)
+
 p0 = cv2.goodFeaturesToTrack(first_frame, mask=None, **feature_params)
+
+# Create a copy of the original image for visualization
+image_with_corners = cv2.cvtColor(first_frame, cv2.COLOR_GRAY2BGR)
+
 # Create a mask image for drawing purposes
 mask = np.zeros_like(cv2.imread(image_paths[0]))
+
+# Draw detected corners as small circles
+if p0 is not None:
+    for p in p0:
+        print(p)
+        x, y = p.ravel()
+        cv2.circle(image_with_corners, (int(x), int(y)), 3, (0, 255, 0), -1)
+
+cv2.imshow("frame", cv2.cvtColor(image_with_corners, cv2.COLOR_BGR2RGB))
+# # Display the result with detected corners
+# plt.figure(figsize=(8, 8))
+# plt.imshow(cv2.cvtColor(image_with_corners, cv2.COLOR_BGR2RGB))
+# plt.title("Detected Particles (Shi-Tomasi Corners)")
+# plt.axis("off")
+# plt.show()
 
 # Create output directory if it doesn't exist
 if not os.path.exists(output_dir):
     os.mkdir(output_dir)
 
 # Iterate over each consecutive image to simulate optical flow
-for i in range(260, len(image_paths)):
+for i in range(2, len(image_paths)):
     frame = cv2.imread(image_paths[i], cv2.IMREAD_GRAYSCALE)
     if frame is None:
         print(f"Frame {image_paths[i]} could not be loaded.")

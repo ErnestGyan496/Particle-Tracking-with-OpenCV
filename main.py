@@ -392,7 +392,9 @@ def largest_Area2(output_folder):
     mask_not_img = cv2.bitwise_not(mask)
     mask_merge_ = cv2.bitwise_and(img, img, mask=mask_not_img)
 
-    _, threshold2 = cv2.threshold(mask_merge_, 60, 250, cv2.THRESH_BINARY)
+    _, threshold2 = cv2.threshold(mask_merge_, 60, 255, cv2.THRESH_BINARY)
+
+    # cv2.imwrite("Max area resulting Image.png", threshold2)
 
     cv2.imshow("contour_on_Mask", contour_on_Mask)
     cv2.imshow("mask_not_img", mask_not_img)
